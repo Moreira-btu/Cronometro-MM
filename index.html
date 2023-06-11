@@ -1,0 +1,451 @@
+<html lang="pt"><head>
+<title>Cronômetro Regressivo</title>
+<meta name="description" content="Este Cronômetro Regressivo Online será útil para cozinhar, praticar esportes ou qualquer outra atividade que exija uma Temporizador.">
+<link rel="canonical" href="https://cronometroregressivo.com">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://cronometroregressivo.com/styles.css?0.1" rel="stylesheet" type="text/css" media="all">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani&amp;family=Righteous&amp;display=swap" rel="stylesheet"> 
+<link rel="shortcut icon" href="https://cronometroregressivo.com/favicon.ico?v=0.1">
+<link rel="apple-touch-icon" sizes="180x180" href="https://cronometroregressivo.com/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://cronometroregressivo.com/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://cronometroregressivo.com/favicon-16x16.png">
+<link rel="manifest" href="https://cronometroregressivo.com/site.webmanifest">
+<link rel="mask-icon" href="https://cronometroregressivo.com/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#ff0000">
+<meta name="theme-color" content="#ffffff">
+
+
+
+<meta property="og:image" content="https://cronometroregressivo.com/img/og.jpg">
+
+<script type="text/javascript">
+
+var timerID = 0;
+var timerID2 = 0;
+var hour="00";
+var minute = "00";
+var second = "00";
+var totaltime=0;
+var begintime=0;
+var colorwr=0;
+var alarmtime=0;
+var alarmlength=60;
+	
+function timer()
+{	
+	var timetemp = new Date()-begintime;
+	timetemp = (totaltime-timetemp)/1000+1;
+	
+	if (timetemp<=1)
+	{
+		timerAlarm();
+		return;
+	}
+	
+	var hour = Math.floor(timetemp/3600);
+	var minute = Math.floor((timetemp - 3600 * hour)/60);
+	var second = Math.floor(timetemp - 3600 * hour - 60 * minute);
+			
+	if (second < 10) {
+		second = "0" + second;
+	}
+		
+	if (minute < 10) {
+		minute = "0" + minute;
+	}
+		
+	if (hour < 10) {
+		hour = "0" + hour;
+	}
+		
+	document.getElementById("timerhour").value = hour;
+	document.getElementById("timerminute").value = minute;
+	document.getElementById("timersecond").value = second;
+	timerID = setTimeout("timer()", 10)
+} 
+
+function timerAlarm(){
+	clearTimeout(timerID);
+	document.getElementById("timersecond").value = "00";
+	document.getElementById("timerhour").disabled = false;
+	document.getElementById("timerminute").disabled = false;
+	document.getElementById("timersecond").disabled = false;
+	document.timergo.startstop.value = "Stop";
+	document.timergo.startstop.onclick = stopAlarm;
+	document.timergo.reset.value = "Stop";
+	document.timergo.reset.onclick = stopAlarm;
+	var i=1;
+	while (document.getElementById("sound"+i)!=null)
+	{
+		if (document.getElementById("sound"+i).checked)
+		{
+			document.getElementById("audio"+i).currentTime = 0;
+			document.getElementById("audio"+i).play();
+			document.getElementById("audio"+i).loop=true;
+		}
+		i++;
+	}
+	alarmtime = Date.now();
+	timerColor();
+}
+
+function testAlarm(){
+	var i=1;
+	while (document.getElementById("sound"+i)!=null)
+	{
+		if (document.getElementById("sound"+i).checked)
+		{
+			document.getElementById("audio"+i).currentTime = 0;
+			document.getElementById("audio"+i).play();
+			document.getElementById("audio"+i).loop=false;
+		}
+		i++;
+	}
+}
+
+function timerColor()
+{	
+	if (colorwr==0)
+	{
+		document.getElementById("alarmbox").style.backgroundColor = "#ff0000";
+		colorwr = 1;
+	}
+	else
+	{
+		document.getElementById("alarmbox").style.backgroundColor = "#444444";
+		colorwr = 0;
+	}
+	
+	var timetemp = new Date()-alarmtime;
+	timetemp = timetemp/1000;
+	if (timetemp>alarmlength)
+	{
+		stopAlarm();
+	}
+	
+	timerID2 = setTimeout("timerColor()", 200);
+} 
+
+function stopAlarm()
+{
+	var i=1;
+	while (document.getElementById("sound"+i)!=null)
+	{
+		document.getElementById("audio"+i).pause();
+		i++;
+	}
+	
+	document.getElementById("alarmbox").style.backgroundColor = "#444444";
+	document.timergo.startstop.value = "Iniciar";
+	document.timergo.startstop.onclick = timerStart;
+	document.timergo.reset.onclick = timerReset;
+	document.timergo.reset.value = "Zerar";
+	clearTimeout(timerID2);
+}
+
+function timerStart(){
+	hour = document.getElementById("timerhour").value;
+	minute = document.getElementById("timerminute").value;
+	second = document.getElementById("timersecond").value;
+	alarmlength = document.getElementById("alarmlength").value;
+	
+	if ((hour==0)&&(minute==0)&&(second==0))
+	{
+		alert("Você deve escolher um horário maior que 00:00:00");
+		return;
+	}
+	
+	if((isNaN(hour) == true)||(isNaN(minute) == true)||(isNaN(second) == true))
+	{
+		alert("Apenas números são permitidos.");
+		return;
+	}
+	
+	if (hour<0)
+	{
+		alert("Você não pode usar um número negativo para horas.");
+		document.getElementById("timerminute").value="59";
+		return;
+	}
+	
+	if ((minute>59)||(minute<0))
+	{
+		alert("Você não pode usar um número negativo ou maior que 59 para minutos.");
+		document.getElementById("timerminute").value="59";
+		return;
+	}
+	
+	if ((second>59)||(second<0))
+	{
+		alert("Você não pode usar um número negativo ou maior que 59 para segundos.");
+		document.getElementById("timersecond").value="59";
+		return;
+	}
+	
+	document.timergo.startstop.value = "Stop";
+	document.timergo.startstop.onclick = timerStop;
+	document.timergo.reset.onclick = timerReset;
+	document.getElementById("timerhour").disabled = "disabled";
+	document.getElementById("timerminute").disabled = "disabled";
+	document.getElementById("timersecond").disabled = "disabled";
+	totaltime = (parseInt(document.getElementById("timerhour").value * 3600 + document.getElementById("timerminute").value * 60 +  document.getElementById("timersecond").value * 1))*1000;
+	begintime = Date.now();
+	timer();
+}
+
+function timerContinue(){
+	document.timergo.startstop.value = "Stop";
+	document.timergo.startstop.onclick = timerStop;
+	document.timergo.reset.onclick = timerReset;
+	totaltime = (parseInt(document.getElementById("timerhour").value * 3600 + document.getElementById("timerminute").value * 60 +  document.getElementById("timersecond").value * 1))*1000;
+	begintime = Date.now();
+	timer();
+}
+
+function timerStop(){
+	document.timergo.startstop.value = "Iniciar";
+	document.timergo.startstop.onclick = timerContinue;
+	document.timergo.reset.onclick = timerReset;
+	document.timergo.reset.value = "Zerar";
+	clearTimeout(timerID);
+}
+
+function timerReset(){
+	document.getElementById("timerhour").disabled = false;
+	document.getElementById("timerminute").disabled = false;
+	document.getElementById("timersecond").disabled = false;
+	document.getElementById("timerhour").value = "00";
+	document.getElementById("timerminute").value = "00";
+	document.getElementById("timersecond").value = "00";
+	document.timergo.startstop.value = "Iniciar";
+	document.timergo.startstop.onclick = timerStart;
+	clearTimeout(timerID);
+}
+
+function addHour(){
+	var h = parseFloat(document.getElementById("timerhour").value);
+	var h1 = h + 1;
+	document.getElementById("timerhour").value = h1;
+}
+
+function addMinute(){
+	var h = parseFloat(document.getElementById("timerminute").value);
+	var h1 = 59;
+	if (h<59){
+		h1 = h + 1;
+	}
+	document.getElementById("timerminute").value = h1;
+}
+
+function addSecond(){
+	var h = parseFloat(document.getElementById("timersecond").value);
+	var h1 = 59;
+	if (h<59){
+		h1 = h + 1;
+	}
+	document.getElementById("timersecond").value = h1;
+}
+
+function subHour(){
+	var h = parseFloat(document.getElementById("timerhour").value);
+	var h1 = h - 1;
+	if (h1<0){
+		h1 = h;
+	}
+	document.getElementById("timerhour").value = h1;
+}
+
+function subMinute(){
+	var h = parseFloat(document.getElementById("timerminute").value);
+	var h1 = h - 1;
+	if (h1<0){
+		h1 = h;
+	}
+	document.getElementById("timerminute").value = h1;
+}
+
+function subSecond(){
+	var h = parseFloat(document.getElementById("timersecond").value);
+	var h1 = h - 1;
+	if (h1<0){
+		h1 = h;
+	}
+	document.getElementById("timersecond").value = h1;
+}
+
+function SetTimeSec(newtimesec){
+	document.getElementById("timersecond").value = newtimesec;
+}
+
+function SetTimeMin(newtimemin){
+	document.getElementById("timerminute").value = newtimemin;
+}
+
+function SetTimeHour(newtimehora){
+	document.getElementById("timerhour").value = newtimehora;
+}
+
+function LoadSound(idsound){
+	document.getElementById(idsound).load();
+}
+
+</script>
+<style>
+#mm-01{
+	width:1000px;
+	position: relative;
+	margin-left: 300px;
+	
+
+}
+@media (max-width: 800px){
+    #mm-01 {
+        margin-top: 0px;
+		margin-left: 70px;
+        max-width: 70vw;
+        max-height: 80vh;
+    }
+
+}
+</style>
+
+</head>
+
+<body>
+	
+<h1>Cronômetro Checkmat MM</h1>
+<nav id="nav">
+		<a href="#nav" title="Show navigation"><img src="https://cronometroregressivo.com/img/icon-menu.png" alt="menu"></a>
+		<a href="#" title="Hide navigation"><img src="https://cronometroregressivo.com/img/icon-menu.png" alt="menu"></a>
+		<div class="clearer"></div>
+		<ul>
+		<li><a href="https://cronometroregressivo.com" title="Cronômetro Regressivo">Cronômetro Regressivo</a></li>
+		<li><a href="https://cronometroregressivo.com/cronometro" title="Cronômetro online">Cronômetro online</a></li>
+		<li><a href="https://cronometroregressivo.com/dataehora" title="Data e hora">Data e hora</a></li>
+		</ul>
+</nav>
+<div class="preset1">
+	<p><strong>PRESET</strong></p>
+	<a href="javascript:timerReset();SetTimeSec('10');SetTimeMin('00');SetTimeHour('00');" title="10 segundos">10 segundos</a><br>
+	<a href="javascript:timerReset();SetTimeSec('20');SetTimeMin('00');SetTimeHour('00')" title="20 segundos">20 segundos</a><br>
+	<a href="javascript:timerReset();SetTimeSec('30');SetTimeMin('00');SetTimeHour('00')" title="30 segundos">30 segundos</a><br>
+	<a href="javascript:timerReset();SetTimeSec('45');SetTimeMin('00');SetTimeHour('00')" title="45 segundos">45 segundos</a><br>
+	<a href="javascript:timerReset();SetTimeMin('01');SetTimeSec('00');SetTimeHour('00')" title="1 minuto">1 minuto</a><br>
+	<a href="javascript:timerReset();SetTimeMin('02');SetTimeSec('00');SetTimeHour('00')" title="2 minutos">2 minutos</a><br>
+	<a href="javascript:timerReset();SetTimeMin('03');SetTimeSec('00');SetTimeHour('00')" title="3 minutos">3 minutos</a><br>
+	<a href="javascript:timerReset();SetTimeMin('04');SetTimeSec('00');SetTimeHour('00')" title="4 minutos">4 minutos</a><br>
+	<a href="javascript:timerReset();SetTimeMin('05');SetTimeSec('00');SetTimeHour('00')" title="5 minutos">5 minutos</a><br>
+</div>
+
+<div id="motor">
+	<div id="alarmbox">
+		<div class="pcenter">
+			<p class="alarmboxtop"><label for="timerhour">Horas</label></p><div class="betweenalarmboxtop"></div><p class="alarmboxtop"><label for="timerminute">Minutos</label></p><div class="betweenalarmboxtop"></div><p class="alarmboxtop"><label for="timersecond">Segundos</label></p>
+		</div>
+		<div class="pcenter">
+			<input type="text" id="timerhour" value="00" class="timer">
+			<input type="text" id="timerminute" value="00" class="timer">
+			<input type="text" id="timersecond" value="00" class="timer">
+		</div>
+		
+		<div class="pcenter">
+			<input type="button" value="+" onclick="addHour()" class="button2">
+			<input type="button" value="-" onclick="subHour()" class="button2">
+			<div class="betweenbutton2"></div>
+			<input type="button" value="+" onclick="addMinute()" class="button2">
+			<input type="button" value="-" onclick="subMinute()" class="button2">
+			<div class="betweenbutton2"></div>
+			<input type="button" value="+" onclick="addSecond()" class="button2">
+			<input type="button" value="-" onclick="subSecond()" class="button2">
+		</div>
+		
+		<form name="timergo">
+			<input type="button" name="startstop" value="Iniciar" onclick="timerStart();" class="button1">
+			<div class="betweenbutton1"></div>
+			<input type="button" name="reset" value="Zerar" onclick="timerReset();" class="button1">
+		</form>
+	</div>
+	
+	<div class="alarmaudio">
+		<ul>
+		<li>
+			<input type="radio" id="sound0" name="audioalarm" checked="checked"><label for="sound0">Silencioso</label>
+		</li>
+		<li>
+			<input type="radio" id="sound3" name="audioalarm" checked="checked"><label for="sound3">Alarme</label>
+			<audio preload="none" class="audioc" id="audio3">
+				<source src="https://cronometroregressivo.com/alarma/1.mp3" type="audio/mpeg">
+				<source src="https://cronometroregressivo.com/alarma/1.ogg" type="audio/ogg">
+				Seu navegador não suporta o elemento de áudio.
+			</audio>
+		</li>
+		
+		<li>
+			<input type="radio" id="sound1" name="audioalarm" onclick="LoadSound('audio1');"><label for="sound1">Trem</label>
+			<audio preload="none" class="audioc" id="audio1">
+				<source src="https://cronometroregressivo.com/alarma/3.mp3" type="audio/mpeg">
+				<source src="https://cronometroregressivo.com/alarma/3.ogg" type="audio/ogg">
+				Seu navegador não suporta o elemento de áudio.
+			</audio>
+		</li>
+		
+		<li>
+			<input type="radio" id="sound2" name="audioalarm" onclick="LoadSound('audio2');"><label for="sound2">Cão</label>
+			<audio preload="none" class="audioc" id="audio2">
+				<source src="https://cronometroregressivo.com/alarma/2.mp3" type="audio/mpeg">
+				<source src="https://cronometroregressivo.com/alarma/2.ogg" type="audio/ogg">
+				Seu navegador não suporta o elemento de áudio.
+			</audio>
+		</li>
+		
+
+		<li>
+			<p><label for="alarmlength">Duração máx</label>: <input type="text" id="alarmlength" value="60" class="dureemax">s.<span class="alarmspace"></span><a href="javascript:testAlarm();" title="Tester alarme" class="tester">Testar Alarme</a></p>
+		</li>
+		</ul>		
+	</div>
+</div>
+<header>
+	
+	<img id="mm-01" src="./img/logo mm.png" alt="" sizes="4000px">
+
+</header>
+
+
+<div class="preset2">
+	<p><strong>PRESET</strong></p>
+	<a href="javascript:timerReset();SetTimeMin('10');SetTimeSec('00');SetTimeHour('00')" title="10 minutos">10 minutos</a><br>
+	<a href="javascript:timerReset();SetTimeMin('15');SetTimeSec('00');SetTimeHour('00')" title="15 minutos">15 minutos</a><br>
+	<a href="javascript:timerReset();SetTimeMin('20');SetTimeSec('00');SetTimeHour('00')" title="20 minutos">20 minutos</a><br>
+	<a href="javascript:timerReset();SetTimeMin('30');SetTimeSec('00');SetTimeHour('00')" title="30 minutos">30 minutos</a><br>
+	<a href="javascript:timerReset();SetTimeMin('40');SetTimeSec('00');SetTimeHour('00')" title="40 minutos">40 minutos</a><br>
+	<a href="javascript:timerReset();SetTimeMin('45');SetTimeSec('00');SetTimeHour('00')" title="45 minutos">45 minutos</a><br>
+	<a href="javascript:timerReset();SetTimeHour('01');SetTimeSec('00');SetTimeMin('00')" title="1 heure">1 heure</a><br>
+	<a href="javascript:timerReset();SetTimeHour('02');SetTimeSec('00');SetTimeMin('00')" title="2 horas">2 horas</a><br>
+	<a href="javascript:timerReset();SetTimeHour('05');SetTimeSec('00');SetTimeMin('00')" title="5 horas">5 horas</a><br>
+</div>
+
+
+<div class="pubresponsiv">
+	</div>
+
+<div class="explantion">
+	<img src="https://cronometroregressivo.com/img/1.jpg" alt="Cronômetro Regressivo" class="imgcenter size1">
+</div>
+
+<div class="explanation">
+	</div>
+	
+<footer>
+	
+</footer>
+<script>
+	setTimeout("LoadSound('audio3')", 3000);
+</script>
+
+
+
+</body></html>
